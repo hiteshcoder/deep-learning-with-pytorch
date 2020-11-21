@@ -6,13 +6,13 @@ Created on Thu Nov 19 18:01:17 2020
 """
 
 import torch
-import torchvision
 
-#This is a 1-D Tensor
+
+#This is a 1-D Tensor or list
 a = torch.tensor([2,2,1])
 print(a)
 
-#This is a 2-D Tensor
+#This is a 2-D Tensor or matrix
 b = torch.tensor([[2,1,4],[3,5,4],[1,2,0],[4,3,2]])
 print(b)
 
@@ -22,9 +22,12 @@ print(b.shape)
 print(a.size())
 print(b.size())
 
+#shape is an attribute and size is a method
+
 #Get the height/number of rows of b
 print(b.shape[0])
 
+#float tensor
 c = torch.FloatTensor([[2,1,4],[3,5,4],[1,2,0],[4,3,2]])
 #or we can do
 #c = torch.tensor([2,2,1], dtype = torch.float)
@@ -37,12 +40,13 @@ print(c)
 print(c.dtype)
 print(d)
 print(d.dtype)
+#some statistical methods
 print(c.mean())
 print(d.mean())
 print(c.std())
 print(d.std())
 
-#Reshape b
+#Reshape b 
 #Note: If one of the dimensions is -1, its size can be inferred
 print(b.view(-1,1))
 print(b.view(12))
@@ -99,12 +103,16 @@ print(r2_like)
 add_result = torch.add(r,r2)
 print(add_result)
 
-#In-place addition (change the value of r2)
-r2.add_(r)    
+#In-place addition (change the value of r2)/ directly assign values 
+r2.add_(r)    #r2=torch.add(r,r2)
 print(r2)
 
+#matrix slicing
+#all rows and column 1
 print(r2[:,1])
+#all rows till 2nd column
 print(r2[:,:2])
+
 print(r2[:3,:])
 num_ten = r2[2,3]
 print(num_ten)
@@ -124,6 +132,8 @@ print(b)
 a.add_(1)
 print(a)
 print(b)
+#if you want to change the values of a torch array it also affects the numpy arrays
+
 
 #Converting NumPy Array to Torch Tensor
 #See how changing the np array changed the Torch Tensor automatically
@@ -133,7 +143,8 @@ np.add(a, 1, out=a)
 print(a)
 print(b)
 
-###FOR GPU PROCESSING
+###FOR GPU PROCESSING########################
+####if you have 
 #Move the tensor to the GPU
 r2 = r2.cuda()
 print(r2)
@@ -187,6 +198,7 @@ tensor_b = torch.unsqueeze(tensor_1,1)
 print(tensor_b)
 print(tensor_b.shape)
 print('\n')
+#2 channels , 3 rows and 4 columns
 tensor_2 = torch.rand(2,3,4)
 print(tensor_2)
 print('\n')
@@ -194,14 +206,17 @@ tensor_c = tensor_2[:,:,2]
 print(tensor_c)
 print(tensor_c.shape)
 print('\n')
+#this is assignment . Ask them to dig out whats this operation and where can it be used
 tensor_d = torch.unsqueeze(tensor_c,2)
 print(tensor_d)
 print(tensor_d.shape)
 
+#AUTOGRAD
+
 #Remember, If requires_grad=True, the Tensor object keeps track of how it was created.
 x = torch.tensor([1., 2., 3], requires_grad=True)
 y = torch.tensor([4., 5., 6], requires_grad=True)
-#Notice that both x and y have their required_grad set to true, therefore we an compute gradients with respect to them
+#Notice that both x and y have their required_grad set to true, therefore we can compute gradients with respect to them
 z = x + y
 print(z)
 # z knows that is was created as a result of addition of x and y. It knows that it wasn't read in from a file
@@ -213,6 +228,7 @@ print(s.grad_fn)
 
 #Now if we backpropagate on s, we can find the gradients of s with respect to x
 s.backward()
+#gradient os s w.r.t x then we do this
 print(x.grad)
 
 # By default, Tensors have `requires_grad=False`
@@ -232,6 +248,7 @@ print(z.grad_fn)
 print(z.requires_grad)
 # Now z has the computation history that relates itself to x and y
 
+#suppose I want to remove the relationship put upon z 
 new_z = z.detach()
 print(new_z.grad_fn)
 # z.detach() returns a tensor that shares the same storage as ``z``, but with the computation history forgotten. 
