@@ -50,6 +50,7 @@ print(d.std())
 #Note: If one of the dimensions is -1, its size can be inferred
 print(b.view(-1,1))
 print(b.view(12))
+#print(b.view(-1,12)) assignment if previous code is same to this or not
 print(b.view(-1,4))
 print(b.view(3,4))
 #Assign b a new shape
@@ -59,7 +60,7 @@ print(b.shape)
 #We can even reshape 3D tensors
 print('\n')
 #Create a 3D Tensor with 2 channels, 3 rows and 4 columns (channles,rows,columns)
-three_dim = torch.randn(2, 3, 4)
+three_dim = torch.randn(2, 3, 4)[[]]
 print('\n')
 print(three_dim)
 print(three_dim.view(2, 12))  # Reshape to 2 rows, 12 columns
@@ -82,6 +83,8 @@ print(in_array.dtype)
 #Create a 2-D array (or matrix) of size 3x3 filled with random integers from values between 6 and 9 (exlusive of 10)
 in_array2 = torch.randint(6,10, (3,3))
 print(in_array2)
+
+#form a 3d tensor of random integers between 5 and 15 #### assignment
 
 #Get the number of elemetns in in_array
 print(torch.numel(in_array))
