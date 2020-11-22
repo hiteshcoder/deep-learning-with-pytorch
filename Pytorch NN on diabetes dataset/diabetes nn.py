@@ -19,8 +19,8 @@ data.head()
 # For y: Extract out the last column (which is the label)
 # Convert both to numpy using the .values method
 x = data.iloc[:,0:-1].values
-y_string= list(data.iloc[:,-1])
-
+y_string = list(data.iloc[:,-1])
+]
 # Lets have a look some samples from our data
 print(x[:3])
 print(y_string[:3])
@@ -50,6 +50,9 @@ y = torch.tensor(y).unsqueeze(1)
 print(x.shape)
 print(y.shape)
 
+#classes
+#overwriting method in a class
+#Dataset object in utils of torch.
 
 class Dataset(Dataset):
 
