@@ -10,6 +10,7 @@ import torch.nn as nn
 import torchvision.datasets as datasets 
 import torchvision.transforms as transforms
 
+
 input_size = 784        #Number of input neurons (image pixels)
 hidden_size = 400       #Number of hidden neurons
 out_size = 10           #Number of classes (0-9) 
