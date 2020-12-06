@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Dec  6 08:58:41 2020
+Created on Sun Dec  5 18:58:41 2020
 
 @author: HiteshNayak
 """
@@ -37,7 +37,8 @@ import matplotlib.pyplot as plt
 random_image = train_dataset[20][0].numpy() * stddev_gray + mean_gray
 plt.imshow(random_image.reshape(28, 28), cmap='gray')
 
-print(train_dataset[20][1])   #Print the corresponding label for the image
+#Print the corresponding label for the image
+print(train_dataset[20][1])   
 
 #Make the dataset iterable
 batch_size = 100
