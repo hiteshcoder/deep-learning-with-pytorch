@@ -74,14 +74,26 @@ class ResidualBlock(nn.Module):
     
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes=10):
+        """
+        Parameters
+        ----------
+        block :The residual block that we defined in previous class
+        layers : are a list [2,2,2] these are the number of individual blocks in each layer
+        num_classes : The CIFAR dataset has 10 classes. The default is 10.
+
+        Returns
+        -------
+        None.
+
+        """
         super(ResNet, self).__init__()
         self.in_channels = 16
         self.conv = conv3x3(3, 16)
         self.bn = nn.BatchNorm2d(16)
         self.relu = nn.ReLU(inplace=True)
-        self.layer1 = self.make_layer(block, 16, layers[0])
-        self.layer2 = self.make_layer(block, 32, layers[1], 2)
-        self.layer3 = self.make_layer(block, 64, layers[2], 2)
+        self.layer1 = self.make_layer(block, 16, layers[0],stride=1)
+        self.layer2 = self.make_layer(block, 32, layers[1], stride=2)
+        self.layer3 = self.make_layer(block, 64, layers[2],stride= 2)
         self.avg_pool = nn.AvgPool2d(8)
         self.fc = nn.Linear(64, num_classes)
         
