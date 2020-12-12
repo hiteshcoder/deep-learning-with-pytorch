@@ -102,6 +102,7 @@ class ResNet(nn.Module):
         if (stride != 1) or (self.in_channels != out_channels):
             downsample = nn.Sequential(conv3x3(self.in_channels, out_channels, stride=stride),
                                        nn.BatchNorm2d(out_channels))
+        #we will need to have the residual blocks built in
         layers = []
         layers.append(block(self.in_channels, out_channels, stride, downsample))
         self.in_channels = out_channels
@@ -120,9 +121,13 @@ class ResNet(nn.Module):
         out = out.view(out.size(0), -1)
         out = self.fc(out)
         return out
-    
+
+
+#number of residual blocks in each layer
 model = ResNet(ResidualBlock, [2, 2, 2]).to(device)
+#loss function ( You can use any)
 criterion = nn.CrossEntropyLoss()
+#optimizer function( You can use any)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 
