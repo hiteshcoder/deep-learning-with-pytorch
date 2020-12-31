@@ -48,7 +48,7 @@ data_transforms = {
 data_dir = 'hymenoptera_data'
 #Create a dictionary that contains the information of the images in both the training and validation set
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),data_transforms[x]) for x in ['train', 'val']}
-#Create a dictionary that contians the data loader
+#Create a dictionary that contains the data loader
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], 
                                               batch_size=4,
                                               shuffle=True) for x in ['train', 'val']}
@@ -67,6 +67,7 @@ print("There are {} testing images".format(dataset_sizes['val']))
 #Load the ResNet
 model_conv = torchvision.models.resnet18(pretrained=True)
 
+
 #Freeze all layers in the network  
 for param in model_conv.parameters():  
     param.requires_grad = False
@@ -80,7 +81,9 @@ if torch.cuda.is_available():
     model_conv = model_conv.cuda()
     
 #Understand what's happening
+#for demonstration we will see how does it work for one batch so loop breaks when iteration value increases
 iteration = 0
+#how many correct predictions do we have
 correct = 0
 for inputs,labels in dataloaders['train']:
     if iteration==1:
@@ -91,46 +94,41 @@ for inputs,labels in dataloaders['train']:
         inputs = inputs.cuda()
         labels = labels.cuda()
     print("For one iteration, this is what happens:")
+    #4*3*224*224 ( 4- bathc size , 3- channels RGB , 224 image size)
     print("Input Shape:",inputs.shape)
     print("Labels Shape:",labels.shape)
     print("Labels are: {}".format(labels))
     output = model_conv(inputs)
     print("Output Tensor:", output)
     print("Outputs Shape",output.shape)
+    #to get the probability which is maximum but we only need the index and not the probability
     _, predicted = torch.max(output, 1)
     print("Predicted:", predicted)
     print("Predicted Shape",predicted.shape)
+    #compare predicted with the labels and check
     correct += (predicted == labels).sum()   
     print("Correct Predictions:",correct)
     
     iteration += 1
-    
+
+#lets define the loss function that we use . Using crossEntropy as we have 2 classes. 
+#we can also use binary cross entropy     
 criterion = nn.CrossEntropyLoss()
+#using Stochastic GD with momentum
+#as we are optimizing the parameters of only fully connected layer
 optimizer = optim.SGD(model_conv.fc.parameters(), lr=0.001, momentum=0.9)
 #Try experimenting with: optim.Adam(model_conv.fc.parameters(), lr=0.001)
 #Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
-#This is to demonstrate what happens in the background of scheduler.step()
-#No need to run this cell unless you want to create your own scheduler 
-def lr_scheduler(optimizer, epoch, init_lr=0.001, lr_decay_epoch=7):
-    """Decay learning rate by a factor of 0.1 every lr_decay_epoch epochs."""
-    lr = init_lr * (0.1**(epoch // lr_decay_epoch))
-
-    if epoch % lr_decay_epoch == 0:
-        print('LR is set to {}'.format(lr))
-        
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
-
-    return optimizer
-
 num_epochs = 25
 for epoch in range (num_epochs):
+    #this needs to be in your epoch loop and not in your batch loop so that it can count 7 epochs to decrease the LR
     exp_lr_scheduler.step()
     #Reset the correct to 0 after passing through all the dataset
     correct = 0
     for images,labels in dataloaders['train']:
+        #tensors have to be wrappend in a variable to do the forward propagations
         images = Variable(images)
         labels = Variable(labels)
         if torch.cuda.is_available():
@@ -168,34 +166,3 @@ with torch.no_grad():
 
     print('Test Accuracy: {:.3f} %'.format(100 * correct / total))
     
-#Visualize some predictions 
-import matplotlib.pyplot as plt
-fig = plt.figure()
-shown_batch = 0
-index = 0
-with torch.no_grad():
-    for (images, labels) in dataloaders['val']:
-        if shown_batch == 1:
-            break
-        shown_batch += 1
-        images = Variable(images)
-        labels = Variable(labels)
-        if torch.cuda.is_available():
-            images = images.cuda()
-            labels = labels.cuda()
-
-        outputs = model_conv(images)                            #The output is of shape (4,2)
-        _, preds = torch.max(outputs, 1)                        #The pred is of shape (4) --> [ 0,  0,  0,  1]
-        
-        for i in range(4):
-            index += 1
-            ax = plt.subplot(2,2,index)
-            ax.axis('off')
-            ax.set_title('Predicted Label: {}'.format(class_names[preds[i]]))
-            input_img = images.cpu().data[i]                    #Get the tensor of the image, and put it to cpu  
-            inp = input_img.numpy().transpose((1, 2, 0))        #If we have a tensor of shape (2,3,4) --> it becomes (3,4,2)
-            mean = np.array([0.485, 0.456, 0.406])
-            std = np.array([0.229, 0.224, 0.225])
-            inp = std * inp + mean
-            inp = np.clip(inp, 0, 1)
-            plt.imshow(inp)
