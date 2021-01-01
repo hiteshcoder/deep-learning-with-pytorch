@@ -98,6 +98,7 @@ for inputs,labels in dataloaders['train']:
     print("Input Shape:",inputs.shape)
     print("Labels Shape:",labels.shape)
     print("Labels are: {}".format(labels))
+    #forward prop the input
     output = model_conv(inputs)
     print("Output Tensor:", output)
     print("Outputs Shape",output.shape)
